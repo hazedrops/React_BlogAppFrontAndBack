@@ -7,13 +7,16 @@ import axios from 'axios'
 import articles from './article-content'
 import NotFoundPage from './NotFoundPage'
 import CommentsList from "../components/CommentsList"
+import AddCommentForm from "../components/AddCommentForm"
 
 const ArticlePage = () => {
   const [articleInfo, setArticleInfo] = useState({ upvotes: 0, comments: [] })
   const { articleId } = useParams()
 
   const addUpvote = async () => {
-    const response = await axios.put(`/api/articles/${articleId}/upvote`);
+    const response = await axios.put(`/api/articles/${articleId}/upvote`)
+    const updatedArticle = response.data
+    setArticleInfo(updatedArticle)
   }
 
   useEffect(() => {
@@ -41,10 +44,14 @@ const ArticlePage = () => {
   return (
     <>
       <h1>{article.title}</h1>
-      <p>This article has {articleInfo.upvotes} upvote(s)</p>
+      <div className='upvotes-section'>
+        <button onClick={addUpvote}>Upvote</button>
+        <p>This article has {articleInfo.upvotes} upvote(s)</p>
+      </div>
       {article.content.map((paragraph, idx) => (
         <p key={idx}>{paragraph}</p>
       ))}
+      <AddCommentForm articleName={articleId} onArticleUpdated = {updatedArticle => setArticleInfo(updatedArticle)} />
       <CommentsList comments={articleInfo.comments} />
     </>
   )
